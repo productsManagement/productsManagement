@@ -10,6 +10,14 @@
 @stop
 
 @section('body.content')
+  <script src='/js/createInput.js'></script>
+  <script>
+    $(document).ready(function() {
+      $('#addValue').on('click', function() {
+        $(this).createInput($('#numberValue'), 'listOfInput');
+      });
+    });
+  </script>
     <div id="welcome">
         <div class="container">
             {!! Form::open(array('route' => 'prototypes.store', 'method' => 'post', 'role'=>'form')) !!}
@@ -25,13 +33,8 @@
 
   			<div class="form-group">
                 {!! Form::label('value', 'Values') !!}
-                {!! Form::number('value_length', 4, array('class' => 'form-control')) !!}
-                  <div class="form-inline">
-                    {!! Form::text('value0', $value=null, array('class' => 'form-control')) !!}
-                  	{!! Form::text('value1', $value=null, array('class' => 'form-control')) !!}
-                  	{!! Form::text('value2', $value=null, array('class' => 'form-control')) !!}
-                  	{!! Form::text('value3', $value=null, array('class' => 'form-control')) !!}
-                  </div>
+                {!! Form::number('value_length', null, array('class' => 'form-control', 'id' => 'numberValue')) !!}
+                <button id='addValue' type='button' class='btn btn-default'>Submit number of value</button>
             </div>
 
             <div>
