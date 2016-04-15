@@ -20,16 +20,6 @@ Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
-Route::get('/demo/example1', 'DemoController@getExample1');
-Route::get('/demo/example2', 'DemoController@getExample2');
-Route::get('/demo/example3', 'DemoController@getExample3');
-Route::get('/demo/example4', 'DemoController@getExample4');
-Route::get('/demo/example5', 'DemoController@getExample5');
-Route::get('/demo/example6', 'DemoController@getExample6');
-Route::get('/demo/example7', 'DemoController@getExample7');
-
-
-
 /*
 	prototype api
 */
@@ -60,6 +50,18 @@ Route::group([], function() {  //'middleware' => ''
 		'as' => 'products.index',
 		'uses' => 'ProductsController@index'
 		]);
+
+	Route::post('/products/change-name', [
+		'as' => 'products.updateName',
+		'uses' => 'ProductsController@updateName'
+		]);
+
+
+	Route::post('/products/change-price', [
+		'as' => 'products.updatePrice',
+		'uses' => 'ProductsController@updatePrice'
+		]);
+
 	// sample epxort
 	Route::get('/products/export', [
 		'as' => 'products.export',
@@ -162,47 +164,33 @@ Route::group([], function() {  //'middleware' => ''
 		]);
 });
 
-
-
 /*
 	Prototype API
 */
 
 Route::group([], function() {  //'middleware' => ''
 	// api return list category
-	Route::get('/prototype', [
-		'as' => 'categories.index',
-		'uses' => 'CategoriesController@index'
-		]);
-
-	Route::get('/categories/{id}/children', [
-		'as' => 'categories.getchildren',
-		'uses' => 'CategoriesController@getchildren'
-		]);
-
-	// sample epxort
-	Route::get('/categories/export', [
-		'as' => 'categories.export',
-		'uses' => 'CategoriesController@export'
+	Route::get('/templates', [
+		'as' => 'templates.index',
+		'uses' => 'Template_ProductsController@index'
 		]);
 
 	// return category data have id
-	Route::get('/categories/{id}', [
-		'as' => 'categories.show',
-		'uses' => 'CategoriesController@show'
+	Route::get('/templates/{id}', [
+		'as' => 'templates.show',
+		'uses' => 'Template_ProductsController@show'
 		]);
 
-	Route::get('/categories/{id}/update', [
-		'as' => 'categories.edit',
-		'uses' => 'CategoriesController@edit'
+	Route::get('/templates/create/{category_id}', [
+		'as' => 'templates.create',
+		'uses' => 'Template_ProductsController@create'
 		]);
 
-	Route::post('/categories/{id}/update', [
-		'as' => 'categories.update',
-		'uses' => 'CategoriesController@update'
+	Route::post('/templates/store', [
+		'as' => 'templates.store',
+		'uses' => 'Template_ProductsController@store'
 		]);
 });
-
 
 
 
@@ -221,3 +209,15 @@ Route::group([], function() {  //'middleware' => ''
 		'uses' => 'ExportsController@index'
 		]);
 });
+
+
+
+//Example
+
+Route::get('/demo/example1', 'DemoController@getExample1');
+Route::get('/demo/example2', 'DemoController@getExample2');
+Route::get('/demo/example3', 'DemoController@getExample3');
+Route::get('/demo/example4', 'DemoController@getExample4');
+Route::get('/demo/example5', 'DemoController@getExample5');
+Route::get('/demo/example6', 'DemoController@getExample6');
+Route::get('/demo/example7', 'DemoController@getExample7');

@@ -5,24 +5,19 @@
 
 
 @section("head.style")	
-    <p>Style</p>
 @stop
 
 @section("body.content")	
-    @include("partials.header")
-    <ul>   
-        @foreach($categories as $category)     
-            <li>
-                <p>Category ID: {{ $category->id }}</p>
-                <p>Category Name: {{ $category->name }}</p>
-                <p>Category description: {{ $category->description }}</p>
-            </li>
-        @endforeach
-    </ul>
-
-    @include("partials.footer")
+    {!!Form::open(array('route'=>array('categories.update',$category->id)))!!}
+    {!!Form::label('labid','Category ID')!!}
+    {!!Form::text('id', $category->id ,['readonly'])!!}<br></br>
+    {!!Form::label('labname','Category Name:')!!}
+    {!!Form::text('name',$category->name)!!}<br></br>
+    {!!Form::label('labdes','Category description: ')!!}
+    {!!Form::text('description',$category->description )!!}<br></br>
+    {!!Form::submit('Sua')!!}
+    {!!Form::close()!!}
 @stop
 
 @section("body.js")
-    <p> Body </p>
 @stop

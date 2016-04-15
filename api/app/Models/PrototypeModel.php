@@ -20,6 +20,11 @@ class PrototypeModel extends Prototype
         return PrototypeModel::where('id', $id)->get($columns);
     }
 
+    public static function getPrototypeByCategoryId($category_id, $columns = ['*']){
+        //return ProductModel::find($id)->get($columns);
+        return PrototypeModel::where('category_id', $category_id)->get($columns);
+    }
+
     public static function createNewPrototype($prototype){
     	return PrototypeModel::create($prototype);
     }    

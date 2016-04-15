@@ -1,7 +1,8 @@
 <?php
 	return [
 		'src' => 'App\Models\BaseModels\Product',
-		'columns' => [			
+		'columns' => [	
+			'id',		
 	        'name',
     		'SKU',
 	        'brand',

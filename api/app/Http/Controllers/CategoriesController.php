@@ -65,8 +65,9 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {        
-        $category = CategoryModel::where('id', $id);
-        return Response::json($category);
+        $category = CategoryModel::getCategoryById( $id);
+        //return Response::json($category);
+        return view('categories.show',['category'=>$category[0]]);
     }
 
     /**
@@ -77,7 +78,8 @@ class CategoriesController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category = CategoryModel::getCategoryById($id);
+        return view('categories.show',['category'=>$category[0]]);
     }
 
     /**
@@ -88,8 +90,10 @@ class CategoriesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        //
+    {        
+        $options = $request->except(['_token']);
+        CategoryModel::updateCategory($id, $options);
+        return CategoriesController::show($id);
     }
 
     /**
@@ -100,6 +104,6 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        CategoryModel::destroy($id);
     }
 }

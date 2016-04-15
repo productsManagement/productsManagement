@@ -9,7 +9,7 @@ use App\Http\Requests;
 
 use App\Http\Controllers\Controller;
 use App\Models\Template_ProductModel;
-use App\Models\UserListExport;
+use App\Models\PrototypeModel;
 use Response;
 use Excel;
 
@@ -22,7 +22,8 @@ class Template_ProductsController extends Controller
      */
     public function index()
     {
-        //
+        $templates = Template_ProductModel::all();
+        return view('template_products.index', ['templates' => $templates]);
     }
 
     /**
@@ -30,9 +31,10 @@ class Template_ProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($category_id)
     {
-        //
+        $prototypes = PrototypeModel::getPrototypeByCategoryId($category_id);
+        return view('template_products.create', ['category_id'=>$category_id, 'prototypes'=>$prototypes]);
     }
 
     /**
@@ -43,7 +45,16 @@ class Template_ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $prototypes = $request->except(['_token', 'category_id', 'required']);
+
+        foreach($prototypes as $prototype){
+            $template = array();
+            $template['category_id'] = $request->input('category_id');
+            $template['prototype_id'] = $prototype;
+            Template_ProductModel::createNewTemplate($template);
+        }
+        return redirect()->route('templates.index');
     }
 
     /**

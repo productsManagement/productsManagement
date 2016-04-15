@@ -19,6 +19,7 @@ class Prototype extends Model
         'type',
 		'required',
         'description',
+        'category_id',
 		'view_id',
 		'created_by',
 		'updated_by'

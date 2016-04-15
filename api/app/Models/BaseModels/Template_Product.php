@@ -15,7 +15,7 @@ class Template_Product extends Model
      */
     protected $fillable = [
 		'category_id',
-		'prototypes',
+		'prototype_id',
 		'created_by',
 		'updated_by'
     ];

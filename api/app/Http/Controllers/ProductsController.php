@@ -10,38 +10,30 @@ use App\Models\ProductModel;
 use App\Models\Template_ProductModel;
 use App\Models\CategoryModel;
 
-use App\Models\UserListExport;
 use Response;
 use Excel;
 
-use Grids;
-use HTML;
-use Illuminate\Support\Facades\Config;
-use Nayjest\Grids\Components\Base\RenderableRegistry;
-use Nayjest\Grids\Components\ColumnHeadersRow;
-use Nayjest\Grids\Components\ColumnsHider;
-use Nayjest\Grids\Components\CsvExport;
-use Nayjest\Grids\Components\ExcelExport;
-use Nayjest\Grids\Components\Filters\DateRangePicker;
-use Nayjest\Grids\Components\FiltersRow;
-use Nayjest\Grids\Components\HtmlTag;
-use Nayjest\Grids\Components\Laravel5\Pager;
-use Nayjest\Grids\Components\OneCellRow;
-use Nayjest\Grids\Components\RecordsPerPage;
-use Nayjest\Grids\Components\RenderFunc;
-use Nayjest\Grids\Components\ShowingRecords;
-use Nayjest\Grids\Components\TFoot;
-use Nayjest\Grids\Components\THead;
-use Nayjest\Grids\Components\TotalsRow;
-use Nayjest\Grids\DbalDataProvider;
-use Nayjest\Grids\EloquentDataProvider;
-use Nayjest\Grids\FieldConfig;
-use Nayjest\Grids\FilterConfig;
-use Nayjest\Grids\Grid;
-use Nayjest\Grids\GridConfig;
-
 class ProductsController extends Controller
 {
+
+    public function updatePrice(Request $request)
+    {
+        $id = $request->input('id');
+        $newPrice = $request->only('price');
+        ProductModel::updateProduct($id, $newPrice);
+        //return redirect()->route('products.index');
+    }
+
+    public function updateName(Request $request)
+    {
+        //return $request->all();
+        $id = $request->input('id');
+        $newName = $request->only('name');
+        if (ProductModel::updateProduct($id, $newName)){
+            return $newName['name'];
+        }
+        //return redirect()->route('products.index');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -49,166 +41,18 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $products = ProductModel::getProductList([
-            'id', 
-            'SKU',
-            'name',
-            'brand',
-            'category_id',
-            'description',
-            'unitName',
-            'unitValue',
-            'buyPrice',
-            'images',
-            'status' ,
-            'tags',
-            'created_by',
-            'updated_by'
+        /*$products = ProductModel::getProductList(['id', 'SKU', 'name', 'brand',
+            'category_id', 'description', 'unitName', 'unitValue', 'buyPrice', 'images',
+            'status' , 'tags', 'created_by',   'updated_by'
         ]);
-
-        //echo Response::json($products);
+        //echo $products->count();
+        return Response::json($products);
         //return view('products.index', ['products' => $products]);
+        */
 
-        
-        $grid = new Grid(
-            (new GridConfig)
-                ->setDataProvider(
-                    new EloquentDataProvider(ProductModel::query())
-                )
-                ->setName('example_grid4')
-                ->setPageSize(25)
-                ->setColumns([
-                    (new FieldConfig)
-                        ->setName('id')
-                        ->setLabel('ID')
-                        ->setCallback(function($val){
-                            return HTML::linkRoute("products.show", "Details", $val);
-                        })
-                        ->setSortable(true)
-                        ->setSorting(Grid::SORT_ASC)
-                    ,
-                    (new FieldConfig)
-                        ->setName('name')
-                        ->setLabel('Name')
-                        ->setSortable(true)
-                        ->addFilter(
-                            (new FilterConfig)
-                                ->setOperator(FilterConfig::OPERATOR_LIKE)
-                        )
-                    ,
-                    (new FieldConfig)
-                        ->setName('brand')
-                        ->setLabel('Brand')
-                        ->setSortable(true)
-                        ->setCallback(function ($val) {
-                            $icon = '<span class="glyphicon glyphicon-user"></span>&nbsp;';
-                            return
-                                '<small>'
-                                . $icon
-                                . HTML::link("provider/$val", $val)
-                                . '</small>';
-                        })
-                        ->addFilter(
-                            (new FilterConfig)
-                                ->setOperator(FilterConfig::OPERATOR_LIKE)
-                        )
-                    ,
-                    (new FieldConfig)
-                        ->setName('description')
-                        ->setLabel('Description')
-                        ->setCallback(function($val){
-                            return substr($val, 0, 50);
-                        })
-                        ->setSortable(true)
-                        ->addFilter(
-                            (new FilterConfig)
-                                ->setOperator(FilterConfig::OPERATOR_LIKE)
-                        )
-                    ,
-                    (new FieldConfig)
-                        ->setName('buyPrice')
-                        ->setLabel('Price')
-                        ->setSortable(true)
-                    ,
-                    (new FieldConfig)
-                        ->setName('status')
-                        ->setLabel('Status')
-                        ->setCallback(function($val){
-                            return $val;
-                        })
-                        ->setSortable(true)
-                        ->addFilter(
-                            (new FilterConfig)
-                                ->setOperator(FilterConfig::OPERATOR_LIKE)
-                        )
-                    ,
-                    (new FieldConfig)
-                        ->setName('created_at')
-                        ->setLabel('Created At')
-                        ->setSortable(true)
-                    ,
-                ])
-                ->setComponents([
-                    (new THead)
-                        ->setComponents([
-                            (new ColumnHeadersRow),
-                            (new FiltersRow)
-                                ->addComponents([
-                                    (new RenderFunc(function () {
-                                        return HTML::style('js/daterangepicker/daterangepicker-bs3.css')
-                                        . HTML::script('js/moment/moment-with-locales.js')
-                                        . HTML::script('js/daterangepicker/daterangepicker.js')
-                                        . "<style>
-                                                .daterangepicker td.available.active,
-                                                .daterangepicker li.active,
-                                                .daterangepicker li:hover {
-                                                    color:black !important;
-                                                    font-weight: bold;
-                                                }
-                                           </style>";
-                                    }))
-                                        ->setRenderSection('filters_row_column_birthday'),
-                                    (new DateRangePicker)
-                                        ->setName('created_at')
-                                        ->setRenderSection('filters_row_column_birthday')
-                                        ->setDefaultValue(['1990-01-01', date('Y-m-d')])
-                                ])
-                            ,
-                            (new OneCellRow)
-                                ->setRenderSection(RenderableRegistry::SECTION_END)
-                                ->setComponents([
-                                    new RecordsPerPage,
-                                    new ColumnsHider,
-                                    (new CsvExport)
-                                        ->setFileName('my_report' . date('Y-m-d'))
-                                    ,
-                                    new ExcelExport(),
-                                    (new HtmlTag)
-                                        ->setContent('<span class="glyphicon glyphicon-refresh"></span> Filter')
-                                        ->setTagName('button')
-                                        ->setRenderSection(RenderableRegistry::SECTION_END)
-                                        ->setAttributes([
-                                            'class' => 'btn btn-success btn-sm'
-                                        ])
-                                ])
-                        ])
-                    ,
-                    (new TFoot)
-                        ->setComponents([
-                            (new OneCellRow)
-                                ->setComponents([
-                                    new Pager,
-                                    (new HtmlTag)
-                                        ->setAttributes(['class' => 'pull-right'])
-                                        ->addComponent(new ShowingRecords)
-                                    ,
-                                ])
-                        ])
-                    ,
-                ])
-        );
-        $grid = $grid->render();
-        return view('products.index', compact('grid'));
+        $grid = ProductModel::getGrid();
+        $text = "<div id='change_name_area'> Here is message </div>";
+        return view('products.index', compact('grid', 'text'));
     }
 
     /**
@@ -240,26 +84,14 @@ class ProductsController extends Controller
     public function storeClassify(Request $request)
     {
         $lastCategory = $request->input('lastCategory');
-        //return $lastCategory;
         return $lastCategory;
     }
 
     public function storeDetails(Request $request)
     {
         $newProduct = $request->only([
-            'SKU',
-            'name',
-            'brand',
-            'category_id',
-            'description',
-            'unitName',
-            'unitValue',
-            'buyPrice',
-            'images',
-            'status' ,
-            'tags',
-            'created_by',
-            'updated_by'
+            'SKU', 'name', 'brand', 'category_id', 'description', 'unitName', 'unitValue',
+            'buyPrice', 'images', 'status', 'tags', 'created_by', 'updated_by'
         ]);
         
         ProductModel::create($newProduct);
@@ -285,8 +117,10 @@ class ProductsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
+    {        
+        $products = ProductModel::getProductById($id);
+        //return Response::json($products);
+        return view('products.show', ['products'=>$products[0]]);
     }
 
     /**
@@ -297,10 +131,10 @@ class ProductsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        $options = $request->all();
+    {        
+        $options = $request->except('_token');
         ProductModel::updateProduct($id, $options);
-        return show($id);
+        return ProductsController::show($id);
     }
 
     public function export(){
